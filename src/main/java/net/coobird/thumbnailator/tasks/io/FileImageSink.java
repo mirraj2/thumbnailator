@@ -57,11 +57,6 @@ import net.coobird.thumbnailator.tasks.UnsupportedFormatException;
 public class FileImageSink implements ImageSink<File> {
 	/**
 	 * The file to which the thumbnail is written to.
-	 * <p>
-	 * Under certain circumstances, the {@link File} object can be replaced
-	 * in the course of processing. This can occur in cases where the file
-	 * extension has been changed due to incongruence between the extension
-	 * and the desired output format.
 	 */
 	private File destinationFile;
 	
@@ -85,7 +80,8 @@ public class FileImageSink implements ImageSink<File> {
 	 * instantiate a {@link OutputStreamImageSink} object before needed.
 	 */
 	private static class UninitializedImageSink extends AbstractImageSink<Void> {
-		public Void getSink() {
+		@Override
+    public Void getSink() {
 			throw new IllegalStateException("This should not happen.");
 		}
 	}
@@ -236,7 +232,8 @@ public class FileImageSink implements ImageSink<File> {
 		return null;
 	}
 	
-	public String preferredOutputFormatName() {
+	@Override
+  public String preferredOutputFormatName() {
 		String fileExtension = getExtension(destinationFile);
 
 		if (fileExtension != null) {
@@ -272,7 +269,8 @@ public class FileImageSink implements ImageSink<File> {
 	 * 										destination file and the destination
 	 * 										file already exists.
 	 */
-	public void write(BufferedImage img) throws IOException {
+	@Override
+  public void write(BufferedImage img) throws IOException {
 		/*
 		 * Add or replace the file extension of the output file.
 		 * 
@@ -284,9 +282,6 @@ public class FileImageSink implements ImageSink<File> {
 		String fileExtension = getExtension(destinationFile);
 		
 		String formatName = outputFormat;
-		if (formatName != null && (fileExtension == null || !isMatchingFormat(formatName, fileExtension))) {
-			destinationFile = new File(destinationFile.getAbsolutePath() + "." + formatName);
-		}
 		
 		if (!allowOverwrite && destinationFile.exists()) {
 			throw new IllegalArgumentException("The destination file exists.");
@@ -337,16 +332,19 @@ public class FileImageSink implements ImageSink<File> {
 	 * 
 	 * @return the destinationFile
 	 */
-	public File getSink() {
+	@Override
+  public File getSink() {
 		return destinationFile;
 	}
 	
-	public void setOutputFormatName(String format) {
+	@Override
+  public void setOutputFormatName(String format) {
 		this.outputFormat = format;
 		this.imageSink.setOutputFormatName(format);
 	}
 
-	public void setThumbnailParameter(ThumbnailParameter param) {
+	@Override
+  public void setThumbnailParameter(ThumbnailParameter param) {
 		this.param = param;
 		this.imageSink.setThumbnailParameter(param);
 	}
